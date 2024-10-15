@@ -11,7 +11,7 @@ Curso de introducción a Angular moderno para Softtek. Edición2. Octubre 24
 
 ## Requisitos para el laboratorio
 
-Comprobar [versión de Node.js](https://angular.dev/rference/versions#) y npm.
+Comprobar [versión de Node.js](https://angular.dev/reference/versions#) y npm.
 
 ```bash
 # Check Node.js and npm versions
