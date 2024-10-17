@@ -1,20 +1,20 @@
 import { Component } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
-import { HeaderComponent } from "./header/header.component";
+import { HeaderComponent } from './header/header.component';
+import { FooterComponent } from "./footer.component";
+import { BookingsComponent } from "./bookings.component";
 
 @Component({
   selector: 'lab-root',
   standalone: true,
-  imports: [RouterOutlet, HeaderComponent],
+  imports: [RouterOutlet, HeaderComponent, FooterComponent, BookingsComponent],
   template: `
-    <lab-header></lab-header>
-    <h1>Welcome to {{title}}!</h1>
-    <p>By {{provider}}</p>
+    <lab-header/>
+    <lab-bookings/>
     <router-outlet />
+    <lab-footer/>
   `,
   styles: [],
 })
 export class AppComponent {
-  title = 'AstroBookings';
-  public provider = 'Softtek';
 }
