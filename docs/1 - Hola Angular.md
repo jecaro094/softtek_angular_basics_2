@@ -135,7 +135,7 @@ EsLint config
         "@angular-eslint/component-class-suffix": [
           "error",
           {
-            "suffixes": ["Component", "Form", "Page", "Template", "Widget"]
+            "suffixes": ["Atom", "Block", "Component", "Page", "Widget"]
           }
         ]
       }
