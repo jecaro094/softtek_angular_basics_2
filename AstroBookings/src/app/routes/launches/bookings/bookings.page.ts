@@ -8,9 +8,7 @@ import {
   WritableSignal,
 } from '@angular/core';
 
-import { ActivatedRoute } from '@angular/router';
-import LAUNCHES_DB from '../../../../db/launches.json';
-import { LaunchDto, NULL_LAUNCH } from '../../../shared/models/launch.dto';
+import { LaunchDto } from '../../../shared/models/launch.dto';
 import { RocketDto } from '../../../shared/models/rocket.dto';
 import { BookFormComponent } from './book-form.component';
 import { LaunchHeaderComponent } from './launch-header.component';
@@ -26,7 +24,7 @@ import { LaunchHeaderComponent } from './launch-header.component';
   imports: [LaunchHeaderComponent, BookFormComponent],
   template: `
     <article>
-      <lab-launch-header [launch]="launch()" />
+      <lab-launch-header [launch]="launch" />
       <lab-book-form
         [rocket]="rocket"
         [currentTravelers]="currentTravelers()"
@@ -35,8 +33,16 @@ import { LaunchHeaderComponent } from './launch-header.component';
   `,
 })
 export default class BookingsPage {
-  // property data
-  launch: WritableSignal<LaunchDto> = signal<LaunchDto>(NULL_LAUNCH);
+  launch: LaunchDto = {
+    id: 'lnch_1',
+    agencyId: 'usr_a1',
+    rocketId: 'rkt_1',
+    date: '2025-07-20T10:00:00Z',
+    mission: 'Artemis I',
+    destination: 'Moon Orbit',
+    pricePerSeat: 28000000,
+    status: 'delayed',
+  };
   rocket: RocketDto = {
     id: 'rkt_1',
     agencyId: 'usr_a1',
@@ -55,28 +61,20 @@ export default class BookingsPage {
   totalTravelers: Signal<number> = computed(() => this.currentTravelers() + this.newTravelers());
 
   // Effects (run on signals changes)
-  private readonly launchStatusEffect = effect(
-    () => {
-      const occupation = this.totalTravelers() / this.rocket.capacity;
-      if (occupation > 0.9) {
-        this.launch.update((launch) => ({ ...launch, status: 'confirmed' }));
-      } else {
-        this.launch.update((launch) => ({ ...launch, status: 'scheduled' }));
-      }
-      console.log('Launch status:', this.launch().status);
-    },
-    {
-      allowSignalWrites: true,
-    },
-  );
-
-  constructor(activateRoute: ActivatedRoute) {
-    const launchId: string = activateRoute.snapshot.params['id'] || '';
-    const launchFound = LAUNCHES_DB.find((launch) => launch.id === launchId);
-    if (launchFound) {
-      this.launch.set(launchFound);
+  private readonly launchStatusEffect = effect(() => {
+    const occupation = this.totalTravelers() / this.rocket.capacity;
+    const currentStatus = this.launch.status;
+    let newStatus = currentStatus;
+    if (occupation > 0.9) {
+      newStatus = 'confirmed';
+    } else {
+      newStatus = 'delayed';
     }
-  }
+    if (newStatus !== currentStatus) {
+      // clone the launch object to trigger change detection
+      this.launch = { ...this.launch, status: newStatus };
+    }
+  });
 
   // Methods (event handlers)
   onBookTravel(newTravelers = 0) {
