@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
-import { FooterComponent } from './core/footer/footer.component';
-import { HeaderComponent } from './core/header/header.component';
+import { FooterComponent } from '@layout/footer/footer.component';
+import { HeaderComponent } from '@layout/header/header.component';
 
 @Component({
   selector: 'lab-root',

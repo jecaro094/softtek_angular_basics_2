@@ -8,11 +8,12 @@ import {
   WritableSignal,
 } from '@angular/core';
 
-import { LaunchDto } from '../../../shared/models/launch.dto';
-import { RocketDto } from '../../../shared/models/rocket.dto';
+import { ActivatedRoute } from '@angular/router';
+import LAUNCHES_DB from '@db/launches.json';
+import { LaunchDto } from '@models/launch.dto';
+import { RocketDto } from '@models/rocket.dto';
 import { BookFormComponent } from './book-form.component';
 import { LaunchHeaderComponent } from './launch-header.component';
-
 /**
  * Bookings page componente
  * Display the launch details and the booking form
@@ -59,6 +60,11 @@ export default class BookingsPage {
 
   // Computed signals
   totalTravelers: Signal<number> = computed(() => this.currentTravelers() + this.newTravelers());
+
+  constructor(activatedRoute: ActivatedRoute) {
+    const launchId: string = activatedRoute.snapshot.params['id'] || '';
+    this.launch = LAUNCHES_DB.find((launch) => launch.id === launchId) || this.launch;
+  }
 
   // Effects (run on signals changes)
   private readonly launchStatusEffect = effect(() => {
