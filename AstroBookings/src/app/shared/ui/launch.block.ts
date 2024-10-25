@@ -15,16 +15,16 @@ import { LaunchTitlePipe } from '@ui/launch-title.pipe';
       <span>{{ launch().status | uppercase }}</span>
     </div>
   `,
-  styles: `.scheduled {
-      color: violet;
-      font-style: italic;
+  styles: `
+    .scheduled {
+      color: teal;
     }
     .confirmed {
       color: green;
+      font-style: bold;
     }
     .delayed {
-      color: limegreen;
-      font-style: italic;
+      color: lime;
     }
     .launched {
       color: orange;
@@ -33,7 +33,8 @@ import { LaunchTitlePipe } from '@ui/launch-title.pipe';
     .aborted {
       color: red;
       font-style: italic;
-    }`,
+    }
+  `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class LaunchBlock {

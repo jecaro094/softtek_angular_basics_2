@@ -8,21 +8,22 @@ import { RouterLink } from '@angular/router';
   template: `
     <header>
       <nav>
-        <a routerLink="">{{ title }}</a>
+        <a routerLink="">
+          <b>{{ title }}</b>
+        </a>
         <section>
-          @for (item of menu; track item.link) { @if(!item.registeredOnly || isAuthenticated) {
+          @for (item of menu; track item.link) { @if (!item.registeredOnly || isAuthenticated) {
           <span>
             <a [routerLink]="item.link">{{ item.title }}</a>
           </span>
-          }}
+          } }
         </section>
       </nav>
     </header>
   `,
-  styles: ``,
 })
 export class HeaderComponent {
-  title = 'Astro Bookings';
+  title = '🚀 Astro Bookings';
   isAuthenticated = false;
   menu = [
     {
