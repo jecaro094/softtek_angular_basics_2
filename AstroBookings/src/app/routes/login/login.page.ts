@@ -36,7 +36,7 @@ import { FormsModule } from '@angular/forms';
       @if(passwordInput.errors) {
       <small>{{ passwordInput.errors | json }}</small>
       }
-      <button type="submit">Login</button>
+      <button type="submit" (click)="onLoginClick()" [disabled]="f.invalid">Login</button>
     </form>
     <pre>{{ f.value | json }}</pre>
   `,
@@ -45,4 +45,8 @@ import { FormsModule } from '@angular/forms';
 export default class LoginPage {
   username = 'admin';
   password = 'secret';
+
+  onLoginClick() {
+    console.log('Login clicked', this.username, this.password);
+  }
 }
