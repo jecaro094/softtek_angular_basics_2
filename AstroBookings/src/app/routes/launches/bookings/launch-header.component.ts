@@ -26,8 +26,17 @@ import { LaunchBlock } from '@ui/launch.block';
 })
 export class LaunchHeaderComponent {
   // Input signals (sent from parent via [input])
+  /**
+   * Launch object, sent from the parent component
+   */
   launch: InputSignal<LaunchDto> = input.required<LaunchDto>();
+  /**
+   * Launch status, sent from the parent component
+   */
   status: InputSignal<LaunchStatus> = input.required<LaunchStatus>();
+  /**
+   * Launch object with the status, computed from the launch and the status
+   */
   launchWithStatus: Signal<LaunchDto & { status: LaunchStatus }> = computed(() => ({
     ...this.launch(),
     status: this.status(),
