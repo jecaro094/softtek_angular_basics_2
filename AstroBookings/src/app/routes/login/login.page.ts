@@ -1,52 +1,67 @@
-import { JsonPipe } from '@angular/common';
-import { ChangeDetectionStrategy, Component } from '@angular/core';
-import { FormsModule } from '@angular/forms';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  effect,
+  signal,
+  WritableSignal,
+} from '@angular/core';
+import { RouterLink } from '@angular/router';
+import { LoginComponent } from './login-form.component';
 
+/**
+ * Login page component
+ */
 @Component({
-  selector: 'lab-login',
   standalone: true,
-  imports: [FormsModule, JsonPipe],
-  template: `
-    <form #f="ngForm">
-      <label for="username">Username:</label>
-      <input
-        type="text"
-        id="username"
-        name="username"
-        [(ngModel)]="username"
-        #usernameInput="ngModel"
-        required
-        minlength="6"
-        maxlength="10"
-        [attr.aria-invalid]="usernameInput.invalid" />
-      @if(usernameInput.errors) {
-      <small>{{ usernameInput.errors | json }}</small>
-      }
-      <label for="password">Password:</label>
-      <input
-        type="password"
-        id="password"
-        name="password"
-        [(ngModel)]="password"
-        #passwordInput="ngModel"
-        required
-        minlength="4"
-        maxlength="10"
-        [attr.aria-invalid]="passwordInput.invalid" />
-      @if(passwordInput.errors) {
-      <small>{{ passwordInput.errors | json }}</small>
-      }
-      <button type="submit" (click)="onLoginClick()" [disabled]="f.invalid">Login</button>
-    </form>
-    <pre>{{ f.value | json }}</pre>
-  `,
   changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [LoginComponent, RouterLink],
+  template: `
+    <lab-login-form
+      [(username)]="username"
+      [(password)]="password"
+      (sendLoginDto)="onSendLoginDto()" />
+    <a routerLink="/register">Don't have an account? Register</a>
+  `,
 })
 export default class LoginPage {
-  username = 'admin';
-  password = 'secret';
+  // Writable signals
 
-  onLoginClick() {
-    console.log('Login clicked', this.username, this.password);
+  /**
+   * Username, default to 'admin'
+   */
+  readonly username: WritableSignal<string> = signal('admin');
+  /**
+   * Password, default to 'secret'
+   */
+  readonly password: WritableSignal<string> = signal('secret');
+
+  // Computed signals
+
+  /**
+   * Login DTO, computed from the username and the password
+   */
+  private readonly loginDto = computed(() => ({
+    username: this.username(),
+    password: this.password(),
+  }));
+
+  // Effects
+
+  /**
+   * Effect to log the username and the password
+   * - Runs when the username or the password changes
+   */
+  private readonly changeEffect = effect(() => {
+    console.log(this.username(), this.password());
+  });
+
+  // Methods (event handlers)
+
+  /**
+   * Method to send the login DTO to the API
+   */
+  onSendLoginDto() {
+    console.log('onSendLoginDto', this.loginDto());
   }
 }
