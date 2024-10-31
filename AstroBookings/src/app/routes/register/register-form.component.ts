@@ -1,13 +1,14 @@
 import { JsonPipe } from '@angular/common';
-import { ChangeDetectionStrategy, Component, output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, output, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'lab-register-form',
   standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [JsonPipe, FormsModule],
   template: `
-    <form #f="ngForm">
+    <form #form="ngForm">
       <label for="username">Username</label>
       <input
         type="text"
@@ -50,19 +51,48 @@ import { FormsModule } from '@angular/forms';
       @if (passwordInput.errors) {
       <small>{{ passwordInput.errors | json }}</small>
       }
-      <button type="submit" (click)="onRegisterClick()" [disabled]="f.invalid">Register</button>
+      <label for="repeatPassword">Repeat Password</label>
+      <input
+        type="text"
+        id="repeatPassword"
+        name="repeatPassword"
+        [(ngModel)]="repeatPassword"
+        #repeatPasswordInput="ngModel"
+        [attr.aria-invalid]="areDifferentPasswords()" />
+      @if (areDifferentPasswords()) {
+      <small>Passwords are different</small>
+      }
+      <button
+        type="submit"
+        (click)="onRegisterClick()"
+        [disabled]="form.invalid || areDifferentPasswords()">
+        Register
+      </button>
     </form>
-    <pre>{{ f.value | json }}</pre>
+    <pre>{{ form.value | json }}</pre>
+    <pre>{{ times }}</pre>
   `,
-  styles: ``,
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class RegisterFormComponent {
   public username = '';
   public email = '';
-  public password = '';
+  public password = signal<string>('');
+
+  public repeatPassword = signal<string>('');
 
   public sendRegisterDto = output<unknown>();
+  public times = 0;
+
+  // public areDifferentPasswords() {
+  //   //console.log('Password checking');
+  //   this.times++;
+  //   return this.password !== this.repeatPassword;
+  // }
+
+  public areDifferentPasswords = computed(() => {
+    this.times++;
+    return this.password() !== this.repeatPassword();
+  });
 
   public onRegisterClick() {
     //console.log('Form Click', this.username);
