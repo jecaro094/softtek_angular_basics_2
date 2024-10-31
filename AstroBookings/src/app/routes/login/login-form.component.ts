@@ -10,6 +10,7 @@ import { FormsModule } from '@angular/forms';
   standalone: true,
   imports: [FormsModule, JsonPipe],
   templateUrl: './login-form.component.html',
+  styles: [],
 })
 export class LoginComponent {
   // Model signals (writable input and output)

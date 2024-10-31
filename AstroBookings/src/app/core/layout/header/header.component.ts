@@ -43,5 +43,9 @@ export class HeaderComponent {
       title: '🔐 Log In',
       link: '/login',
     },
+    {
+      title: '🔏 Register',
+      link: '/register',
+    },
   ];
 }
