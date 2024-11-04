@@ -1,29 +1,37 @@
-import { JsonPipe, UpperCasePipe } from '@angular/common';
-import { ChangeDetectionStrategy, Component, input, InputSignal } from '@angular/core';
+import { JsonPipe } from '@angular/common';
+import { Component, computed, input } from '@angular/core';
 import { FormsModule, NgModel } from '@angular/forms';
 
 @Component({
   selector: 'lab-control',
   standalone: true,
-  imports: [UpperCasePipe, JsonPipe, FormsModule],
+  imports: [FormsModule, JsonPipe],
   template: `
-    <div>
-      <label [for]="controlName()">{{ caption() || controlName() | uppercase }}</label>
-
-      <ng-content></ng-content>
-      <pre>Hola</pre>
-      <pre>{{ control().value | json }}</pre>
-      @if (control().errors) {
-      <small>{{ control().errors | json }}</small>
-      }
-    </div>
+    <label [for]="controlName()">{{ labelCaption() }}</label>
+    <ng-content></ng-content>
+    @if (control().errors) {
+    <small>{{ control().errors | json }}</small>
+    }
   `,
-  styles: ``,
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ControlBlock {
-  controlName: InputSignal<string> = input.required<string>();
-  caption: InputSignal<string | undefined> = input<string | undefined>();
-  control: InputSignal<NgModel> = input.required<NgModel>();
-  // BUG: control no está recibiendo el valor de ngModel
+  // Input signals
+
+  /**
+   * Label caption
+   * - If not provided, control name will be used
+   */
+  label = input<string>();
+
+  /**
+   * NgModel control
+   */
+  control = input.required<NgModel>();
+
+  // Computed signals
+
+  controlName = computed(() => this.control().name);
+  labelCaption = computed(
+    () => this.label() || this.controlName().charAt(0).toUpperCase() + this.controlName().slice(1),
+  );
 }

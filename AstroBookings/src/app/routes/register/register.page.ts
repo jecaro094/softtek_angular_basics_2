@@ -1,14 +1,28 @@
-import { ChangeDetectionStrategy, Component } from '@angular/core';
-import { RegisterFormComponent } from './register-form.component';
+import { Component } from '@angular/core';
 
+import { RegisterComponent } from './register-form.component';
+import { RegisterDto } from './register.dto';
+
+/**
+ * Register page component
+ */
 @Component({
   standalone: true,
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [RegisterFormComponent],
-  template: ` <lab-register-form (sendRegisterDto)="onSendRegisterDto($event)" /> `,
+  imports: [RegisterComponent],
+  template: `
+    <h2>Register</h2>
+    <lab-register (sendRegisterDto)="onRegister($event)" />
+    <a routerLink="/login">Already have an account? Login</a>
+  `,
 })
 export default class RegisterPage {
-  public onSendRegisterDto(registerDto: unknown) {
-    console.log('Page send', registerDto);
+  // Event handler
+
+  /**
+   * Register event handler, sent from the presenter
+   * @param registerDto - Register DTO from the presenter form
+   */
+  onRegister(registerDto: RegisterDto) {
+    console.log('Register submitted', registerDto);
   }
 }

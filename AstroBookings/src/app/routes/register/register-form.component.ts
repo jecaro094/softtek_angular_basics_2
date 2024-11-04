@@ -1,18 +1,21 @@
 import { JsonPipe } from '@angular/common';
-import { ChangeDetectionStrategy, Component, computed, model, output, signal } from '@angular/core';
+import { Component, computed, model, ModelSignal, output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ControlBlock } from '@ui/control.block';
 import { ValidPasswordDirective } from '@ui/valid-password.directive';
+import { RegisterDto } from './register.dto';
 
+/**
+ * Register presenter form component
+ */
 @Component({
-  selector: 'lab-register-form',
+  selector: 'lab-register',
   standalone: true,
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [JsonPipe, FormsModule, ValidPasswordDirective, ControlBlock],
+  imports: [FormsModule, JsonPipe, ValidPasswordDirective, ControlBlock],
   template: `
     <form #form="ngForm">
       <fieldset>
-        <lab-control controlName="username" [control]="usernameInput">
+        <lab-control label="User name" [control]="usernameInput">
           <input
             type="text"
             id="username"
@@ -24,9 +27,7 @@ import { ValidPasswordDirective } from '@ui/valid-password.directive';
             maxlength="20"
             [attr.aria-invalid]="usernameInput.invalid" />
         </lab-control>
-
-        <div>
-          <label for="email">Email</label>
+        <lab-control [control]="emailInput">
           <input
             type="email"
             id="email"
@@ -34,33 +35,14 @@ import { ValidPasswordDirective } from '@ui/valid-password.directive';
             #emailInput="ngModel"
             [(ngModel)]="email"
             required
+            email
             minlength="3"
             maxlength="20"
             [attr.aria-invalid]="emailInput.invalid" />
-          @if (emailInput.errors) {
-          <small>{{ emailInput.errors | json }}</small>
-          }
-        </div>
-        <div>
-          <label for="email">Email</label>
+        </lab-control>
+        <lab-control [control]="passwordInput">
           <input
-            type="email"
-            id="email"
-            name="email"
-            #emailInput="ngModel"
-            [(ngModel)]="email"
-            required
-            minlength="3"
-            maxlength="20"
-            [attr.aria-invalid]="emailInput.invalid" />
-          @if (emailInput.errors) {
-          <small>{{ emailInput.errors | json }}</small>
-          }
-        </div>
-        <div>
-          <label for="password">Password</label>
-          <input
-            type="text"
+            type="password"
             id="password"
             name="password"
             [(ngModel)]="password"
@@ -70,23 +52,19 @@ import { ValidPasswordDirective } from '@ui/valid-password.directive';
             maxlength="20"
             labValidPassword
             [attr.aria-invalid]="passwordInput.invalid" />
-          @if (passwordInput.errors) {
-          <small>{{ passwordInput.errors | json }}</small>
-          }
-        </div>
-        <div>
-          <label for="repeatPassword">Repeat Password</label>
+        </lab-control>
+        <lab-control label="Repeat Password" [control]="repeatPasswordInput">
           <input
-            type="text"
+            type="password"
             id="repeatPassword"
             name="repeatPassword"
-            [(ngModel)]="repeatPassword"
+            [(ngModel)]="repeatedPassword"
             #repeatPasswordInput="ngModel"
             [attr.aria-invalid]="areDifferentPasswords()" />
           @if (areDifferentPasswords()) {
           <small>Passwords are different</small>
           }
-        </div>
+        </lab-control>
       </fieldset>
       <button
         type="submit"
@@ -96,37 +74,70 @@ import { ValidPasswordDirective } from '@ui/valid-password.directive';
       </button>
     </form>
     <pre>{{ form.value | json }}</pre>
-    <pre>{{ times }}</pre>
+    <pre>Password checked {{ times }} times</pre>
   `,
 })
-export class RegisterFormComponent {
-  public username = model('');
-  public email = '';
-  public password = signal<string>('');
+export class RegisterComponent {
+  // Model signals (writable input and output)
 
-  public repeatPassword = signal<string>('');
+  /**
+   * Username, model signal
+   */
+  readonly username: ModelSignal<string> = model<string>('');
+  /**
+   * Email, model signal
+   */
+  readonly email: ModelSignal<string> = model<string>('');
+  /**
+   * Password, model signal
+   */
+  readonly password: ModelSignal<string> = model<string>('');
+  /**
+   * Repeated password, model signal
+   */
+  readonly repeatedPassword: ModelSignal<string> = model<string>('');
+  /**
+   * Accepted terms, model signal
+   */
+  readonly acceptedTerms: ModelSignal<boolean> = model<boolean>(false);
+  /**
+   * Send register DTO event, sent to the parent
+   */
+  readonly sendRegisterDto = output<RegisterDto>();
 
-  public sendRegisterDto = output<unknown>();
+  // Computed signals
+
   public times = 0;
 
   // public areDifferentPasswords() {
-  //   //console.log('Password checking');
   //   this.times++;
   //   return this.password !== this.repeatPassword;
   // }
 
+  /**
+   * Passwords do not match,
+   * - computed signal to validate repeated password
+   */
   public areDifferentPasswords = computed(() => {
-    //console.log('asdfasdf');
     this.times++;
-    return this.password() !== this.repeatPassword();
+    return this.password() !== this.repeatedPassword();
   });
 
-  public onRegisterClick() {
-    //console.log('Form Click', this.username);
-    this.sendRegisterDto.emit({
-      username: this.username,
-      email: this.email,
-      password: this.password,
-    });
+  // readonly areDifferentPasswords = computed(() => this.password() !== this.repeatedPassword());
+
+  // Event handler
+
+  /**
+   * Register DTO click handler
+   * - Emits the register DTO
+   */
+  onRegisterClick() {
+    const registerDto = {
+      username: this.username(),
+      email: this.email(),
+      password: this.password(),
+      acceptedTerms: this.acceptedTerms(),
+    };
+    this.sendRegisterDto.emit(registerDto);
   }
 }
