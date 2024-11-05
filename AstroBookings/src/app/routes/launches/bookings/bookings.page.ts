@@ -3,6 +3,7 @@ import {
   Component,
   computed,
   effect,
+  inject,
   input,
   InputSignal,
   Signal,
@@ -17,6 +18,7 @@ import { BookingDto } from '@models/booking.dto';
 import { LaunchDto, LaunchStatus, NULL_LAUNCH } from '@models/launch.dto';
 import { NULL_ROCKET, RocketDto } from '@models/rocket.dto';
 import { BookFormComponent } from './book-form.component';
+import { BookingsService } from './bookings.service';
 import { LaunchHeaderComponent } from './launch-header.component';
 /**
  * Bookings page componente
@@ -37,6 +39,8 @@ import { LaunchHeaderComponent } from './launch-header.component';
   `,
 })
 export default class BookingsPage {
+  bookingsService = inject(BookingsService);
+
   // Input signals
 
   /**
