@@ -1,6 +1,7 @@
 import { ApplicationConfig, provideZoneChangeDetection } from '@angular/core';
 import { provideRouter, withComponentInputBinding } from '@angular/router';
 
+import { provideHttpClient } from '@angular/common/http';
 import { provideClientHydration } from '@angular/platform-browser';
 import { routes } from './app.routes';
 import { LoginService } from './routes/login/login.service';
@@ -13,6 +14,7 @@ export const appConfig: ApplicationConfig = {
     // LoginService,
     //{ provide: LoginService, useClass: LoginService },
     provideLoginService(),
+    provideHttpClient(),
   ],
 };
 

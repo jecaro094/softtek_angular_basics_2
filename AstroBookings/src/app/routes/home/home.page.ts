@@ -1,8 +1,8 @@
-import { ChangeDetectionStrategy, Component, Signal, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, Signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
-import { LAUNCHES_DB } from '@db/launches';
 import { LaunchDto } from '@models/launch.dto';
 import { LaunchBlock } from '@ui/launch.block';
+import { HomeService } from './home.service';
 
 /**
  * Home page with a list of launches
@@ -13,6 +13,9 @@ import { LaunchBlock } from '@ui/launch.block';
   imports: [RouterLink, LaunchBlock],
   template: `
     <section class="list">
+      <p>
+        Upcoming <b>{{ launches().length }}</b> launches
+      </p>
       @for (launch of launches(); track launch.id) {
       <article>
         <lab-launch [launch]="launch"></lab-launch>
@@ -37,5 +40,7 @@ import { LaunchBlock } from '@ui/launch.block';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export default class HomePage {
-  launches: Signal<LaunchDto[]> = signal(LAUNCHES_DB);
+  homeService = inject(HomeService);
+
+  launches: Signal<LaunchDto[]> = this.homeService.getLaunches();
 }
