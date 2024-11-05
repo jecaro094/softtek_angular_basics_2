@@ -9,7 +9,7 @@ import { Observable } from 'rxjs';
 })
 export class HomeService {
   http = inject(HttpClient);
-  readonly URL = 'http://localhost:3000/api/launches?delay=5000';
+  readonly URL = 'http://localhost:3000/api/launches?delay=1000';
 
   getLaunches(): Signal<LaunchDto[]> {
     const getLaunches$: Observable<LaunchDto[]> = this.http.get<LaunchDto[]>(this.URL);
