@@ -18,6 +18,7 @@ import { LoginService } from './login.service';
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [LoginComponent, RouterLink],
+  providers: [],
   template: `
     <lab-login-form
       [(username)]="username"

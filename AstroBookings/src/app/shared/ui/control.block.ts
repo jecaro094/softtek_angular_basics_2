@@ -7,11 +7,13 @@ import { FormsModule, NgModel } from '@angular/forms';
   standalone: true,
   imports: [FormsModule, JsonPipe],
   template: `
-    <label [for]="controlName()">{{ labelCaption() }}</label>
-    <ng-content></ng-content>
-    @if (control().errors) {
-    <small>{{ control().errors | json }}</small>
-    }
+    <div>
+      <label [for]="controlName()">{{ labelCaption() }}</label>
+      <ng-content></ng-content>
+      @if (control().errors) {
+      <small>{{ control().errors | json }}</small>
+      }
+    </div>
   `,
 })
 export class ControlBlock {
