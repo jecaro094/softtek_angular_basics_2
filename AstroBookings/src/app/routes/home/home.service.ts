@@ -17,13 +17,12 @@ export class HomeService {
 
   /**
    * Get the list of launches as a signal
+   * - Logs errors as a demo of error handling with tap
    */
   getLaunches(): Signal<LaunchDto[]> {
-    const getLaunches$: Observable<LaunchDto[]> = this.http.get<LaunchDto[]>(this.URL).pipe(
-      tap({
-        error: (err) => console.error('Error', err),
-      }),
-    );
+    const getLaunches$: Observable<LaunchDto[]> = this.http
+      .get<LaunchDto[]>(this.URL)
+      .pipe(tap({ error: (err) => console.error('Error', err) }));
     return toSignal(getLaunches$, { initialValue: [] });
   }
 }

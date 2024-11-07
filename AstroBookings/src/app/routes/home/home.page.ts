@@ -40,7 +40,16 @@ import { HomeService } from './home.service';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export default class HomePage {
-  homeService = inject(HomeService);
+  // Injectable services
+  /**
+   * Facade service for the home page
+   */
+  readonly homeService = inject(HomeService);
 
-  launches: Signal<LaunchDto[]> = this.homeService.getLaunches();
+  // Read-only signals
+
+  /**
+   * List of launches, filled by the getLaunches service method
+   */
+  readonly launches: Signal<LaunchDto[]> = this.homeService.getLaunches();
 }
