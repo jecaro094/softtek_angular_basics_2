@@ -13,10 +13,10 @@ import {
 
 import { BOOKINGS_DB } from '@db/bookings';
 import { LAUNCHES_DB } from '@db/launches';
-import { ROCKETS_DB } from '@db/rockets';
 import { BookingDto } from '@models/booking.dto';
 import { LaunchDto, LaunchStatus, NULL_LAUNCH } from '@models/launch.dto';
 import { NULL_ROCKET, RocketDto } from '@models/rocket.dto';
+import { map, tap } from 'rxjs';
 import { BookFormComponent } from './book-form.component';
 import { BookingsService } from './bookings.service';
 import { LaunchHeaderComponent } from './launch-header.component';
@@ -31,6 +31,7 @@ import { LaunchHeaderComponent } from './launch-header.component';
   template: `
     <article>
       <lab-launch-header [launch]="launch()" [status]="launchStatus()" />
+      {{ rocket().name }} - {{ rocket().range }}
       <lab-book-form
         [rocket]="rocket()"
         [currentTravelers]="currentTravelers()"
@@ -61,25 +62,30 @@ export default class BookingsPage {
    * Launch object, computed from the id
    * Default to NULL_LAUNCH if not found
    */
-  launch: Signal<LaunchDto> = computed(
-    () => LAUNCHES_DB.find((launch) => launch.id === this.id()) || NULL_LAUNCH,
-  );
+  // launch: Signal<LaunchDto> = computed(
+  //   () => LAUNCHES_DB.find((launch) => launch.id === this.id()) || NULL_LAUNCH,
+  // );
+  launch: WritableSignal<LaunchDto> = signal(NULL_LAUNCH);
+
   /**
    * Rocket object, computed from the launch
    * Default to NULL_ROCKET if not found
    */
-  rocket: Signal<RocketDto> = computed(
-    () => ROCKETS_DB.find((rocket) => rocket.id === this.launch().rocketId) || NULL_ROCKET,
-  );
+  // rocket: Signal<RocketDto> = computed(
+  //   () => ROCKETS_DB.find((rocket) => rocket.id === this.launch().rocketId) || NULL_ROCKET,
+  // );
+  rocket: WritableSignal<RocketDto> = signal(NULL_ROCKET);
+
   /**
    * Current travelers, computed from the number of seats booked for this launch
    */
-  currentTravelers: Signal<number> = computed(() => {
-    // get the bookings for the launch
-    const bookings = BOOKINGS_DB.filter((booking) => booking.launchId === this.id());
-    // return the number of travelers
-    return bookings.reduce((acc, booking) => acc + booking.numberOfSeats, 0);
-  });
+  // currentTravelers: Signal<number> = computed(() => {
+  //   // get the bookings for the launch
+  //   const bookings = BOOKINGS_DB.filter((booking) => booking.launchId === this.id());
+  //   // return the number of travelers
+  //   return bookings.reduce((acc, booking) => acc + booking.numberOfSeats, 0);
+  // });
+  currentTravelers: WritableSignal<number> = signal(0);
   /**
    * Total travelers, computed from the current travelers and the new travelers
    */
@@ -98,6 +104,56 @@ export default class BookingsPage {
   });
 
   // Effects
+
+  constructor() {
+    // effect(() => {
+    //   const x = this.id();
+    //   console.log('id', x);
+    //   this.bookingsService.getLaunchById(x).subscribe((y) => this.launch.set(y));
+    // });
+  }
+
+  getLaunchEffect = effect(
+    () => {
+      // signal triggers
+      const launchId = this.id();
+      // side effects
+      this.bookingsService.getLaunchById$(launchId).subscribe((launch) => this.launch.set(launch));
+    },
+    { allowSignalWrites: true },
+  );
+
+  getRocketWhenLaunchChangesEffect = effect(
+    () => {
+      // signal triggers
+      const rocketId = this.launch().rocketId;
+      if (!rocketId) return;
+      // side effects
+      this.bookingsService.getRocketById$(rocketId).subscribe((rocket) => this.rocket.set(rocket));
+    },
+    { allowSignalWrites: true },
+  );
+
+  getBookingsEffect = effect(
+    () => {
+      // signal triggers
+      const id = this.id();
+      if (!id) return;
+      // side effects
+      this.bookingsService
+        .getBookingsByLaunchId$(id)
+        .pipe(
+          map((bookings: BookingDto[]) =>
+            bookings.reduce((acc, booking) => acc + booking.numberOfSeats, 0),
+          ),
+          tap((currentTravelers: number) => this.currentTravelers.set(currentTravelers)),
+        )
+        .subscribe();
+    },
+    {
+      allowSignalWrites: true,
+    },
+  );
 
   /**
    * Effect to save the launch status to the database
