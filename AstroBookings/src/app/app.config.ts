@@ -1,9 +1,11 @@
-import { ApplicationConfig, provideZoneChangeDetection } from '@angular/core';
+import { ApplicationConfig, ErrorHandler, provideZoneChangeDetection } from '@angular/core';
 import { provideRouter, withComponentInputBinding } from '@angular/router';
 
-import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { provideClientHydration } from '@angular/platform-browser';
 import { routes } from './app.routes';
+import { apiAuditorInterceptor } from './core/api-auditor.interceptor';
+import { GlobalErrorHandlerService } from './core/global-error-handler.service';
 import { LoginService } from './routes/login/login.service';
 
 export const appConfig: ApplicationConfig = {
@@ -14,7 +16,8 @@ export const appConfig: ApplicationConfig = {
     // LoginService,
     //{ provide: LoginService, useClass: LoginService },
     provideLoginService(),
-    provideHttpClient(),
+    provideHttpClient(withInterceptors([apiAuditorInterceptor])),
+    { provide: ErrorHandler, useClass: GlobalErrorHandlerService },
   ],
 };
 

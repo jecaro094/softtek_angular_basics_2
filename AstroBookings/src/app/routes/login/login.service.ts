@@ -1,5 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
+import { environment } from 'environments/environment.development';
 import { LoginDto, UserToken } from './login.dto';
 
 /**
@@ -14,7 +15,7 @@ export class LoginService {
   /**
    * URL to the login API (should come from an environment variable)
    */
-  readonly URL = 'http://localhost:3000/api/login?status=200';
+  readonly URL = `${environment.apiUrl}/login?status=200`;
 
   /**
    * Post a login DTO to the login API

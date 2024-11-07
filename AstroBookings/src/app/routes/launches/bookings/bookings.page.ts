@@ -17,6 +17,7 @@ import { BookingDto } from '@models/booking.dto';
 import { LaunchDto, LaunchStatus, NULL_LAUNCH } from '@models/launch.dto';
 import { NULL_ROCKET, RocketDto } from '@models/rocket.dto';
 import { map, tap } from 'rxjs';
+import { errorContext } from 'rxjs/internal/util/errorContext';
 import { BookFormComponent } from './book-form.component';
 import { BookingsService } from './bookings.service';
 import { LaunchHeaderComponent } from './launch-header.component';
@@ -118,7 +119,10 @@ export default class BookingsPage {
       // signal triggers
       const launchId = this.id();
       // side effects
-      this.bookingsService.getLaunchById$(launchId).subscribe((launch) => this.launch.set(launch));
+      this.bookingsService.getLaunchById$(launchId).subscribe({
+        next: (launch) => this.launch.set(launch),
+        error: (error) => console.error('Error getting launch', errorContext(error)),
+      });
     },
     { allowSignalWrites: true },
   );

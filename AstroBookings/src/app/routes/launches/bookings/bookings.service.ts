@@ -3,7 +3,7 @@ import { inject, Injectable } from '@angular/core';
 import { BookingDto } from '@models/booking.dto';
 import { LaunchDto } from '@models/launch.dto';
 import { RocketDto } from '@models/rocket.dto';
-import { Observable } from 'rxjs';
+import { catchError, Observable, of } from 'rxjs';
 
 /**
  * Bookings service to get the launch by id
@@ -28,7 +28,18 @@ export class BookingsService {
   }
 
   getRocketById$(rocketId: string): Observable<RocketDto> {
-    return this.http.get<RocketDto>(`${this.ROCKETS}/${rocketId}`);
+    return this.http.get<RocketDto>(`${this.ROCKETS}/${rocketId}?status=404`).pipe(
+      catchError((error) => {
+        console.log('Error', error);
+        return of({
+          id: '',
+          agencyId: '',
+          name: 'Rocket not found',
+          capacity: 0,
+          range: 'unknown',
+        });
+      }),
+    );
   }
 
   getBookingsByLaunchId$(launchId: string): Observable<BookingDto[]> {
